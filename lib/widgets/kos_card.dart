@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../models/kos.dart';
+import '../screens/kos_detail_screen.dart';
 
 /// Card widget displaying summary information for a public boarding house (`US01-AC1`).
+/// Tapping the card navigates to [KosDetailScreen] (`US02-AC1`).
 class KosCard extends StatelessWidget {
   const KosCard({
     super.key,
@@ -19,7 +21,14 @@ class KosCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 1,
-      child: Padding(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => KosDetailScreen(kos: kos),
+          ),
+        ),
+        child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,6 +125,7 @@ class KosCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
       ),
     );
   }
