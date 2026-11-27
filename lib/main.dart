@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/app_config.dart';
 import 'providers/kos_list_provider.dart';
 import 'repositories/kos_repository.dart';
+import 'screens/kos_list_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,14 +20,21 @@ Future<void> main() async {
 }
 
 class KosFinderApp extends StatelessWidget {
-  const KosFinderApp({super.key});
+  const KosFinderApp({
+    super.key,
+    this.kosRepository,
+  });
+
+  final KosRepository? kosRepository;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => KosListProvider(repository: KosRepository()),
+          create: (_) => KosListProvider(
+            repository: kosRepository ?? KosRepository(),
+          ),
         ),
       ],
       child: MaterialApp(
@@ -35,11 +43,7 @@ class KosFinderApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
           useMaterial3: true,
         ),
-        home: const Scaffold(
-          body: Center(
-            child: Text('KosFinder'),
-          ),
-        ),
+        home: const KosListScreen(),
       ),
     );
   }
