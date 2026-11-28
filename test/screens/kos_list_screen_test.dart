@@ -6,6 +6,7 @@ import 'package:kosfinder/models/kos.dart';
 import 'package:kosfinder/providers/kos_list_provider.dart';
 import 'package:kosfinder/repositories/kos_repository.dart';
 import 'package:kosfinder/screens/kos_list_screen.dart';
+import 'package:kosfinder/widgets/filter_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 class _FakeKosRepository implements KosRepository {
@@ -157,6 +158,108 @@ void main() {
       expect(find.byIcon(Icons.ac_unit), findsOneWidget);
       expect(find.byIcon(Icons.bathtub_outlined), findsOneWidget);
       expect(find.byIcon(Icons.bolt), findsOneWidget);
+    });
+
+    testWidgets('search bar filters kos case-insensitively (US03-AC1)',
+        (tester) async {
+      final repo = _FakeKosRepository(
+        items: [
+          _sampleKos(id: '1', name: 'Kos Melati', area: 'Singaraja'),
+          _sampleKos(id: '2', name: 'Kos Kenanga', area: 'Denpasar'),
+        ],
+      );
+
+      await tester.pumpWidget(_buildTestApp(repo));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('search_kos_field')),
+        'singaraja',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Kos Melati'), findsOneWidget);
+      expect(find.text('Kos Kenanga'), findsNothing);
+    });
+
+    testWidgets(
+        'filter bottom sheet filters by max price and facilities (US03-AC2, US03-AC3)',
+        (tester) async {
+      final repo = _FakeKosRepository(
+        items: [
+          _sampleKos(
+            id: '1',
+            name: 'Kos Hemat',
+            pricePerMonth: 1200000,
+            hasWifi: true,
+            hasAc: true,
+          ),
+          _sampleKos(
+            id: '2',
+            name: 'Kos Mahal',
+            pricePerMonth: 2000000,
+            hasWifi: true,
+            hasAc: true,
+          ),
+          _sampleKos(
+            id: '3',
+            name: 'Kos Tanpa AC',
+            pricePerMonth: 900000,
+            hasWifi: true,
+            hasAc: false,
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(_buildTestApp(repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('filter_button')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('max_price_field')),
+        '1500000',
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.byType(FilterBottomSheet),
+          matching: find.text('WiFi'),
+        ),
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.byType(FilterBottomSheet),
+          matching: find.text('AC'),
+        ),
+      );
+      await tester.tap(find.text('Terapkan'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Kos Hemat'), findsOneWidget);
+      expect(find.text('Kos Mahal'), findsNothing);
+      expect(find.text('Kos Tanpa AC'), findsNothing);
+    });
+
+    testWidgets('shows empty filter message when no kos matches (US03-AC4)',
+        (tester) async {
+      final repo = _FakeKosRepository(
+        items: [_sampleKos(id: '1', name: 'Kos Melati', area: 'Singaraja')],
+      );
+
+      await tester.pumpWidget(_buildTestApp(repo));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('search_kos_field')),
+        'jakarta',
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Tidak ada kos yang sesuai dengan kriteria pencarian'),
+        findsOneWidget,
+      );
     });
   });
 }
