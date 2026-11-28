@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/app_config.dart';
 import 'providers/auth_provider.dart';
 import 'providers/kos_list_provider.dart';
+import 'providers/owner_kos_provider.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/kos_repository.dart';
 import 'screens/kos_list_screen.dart';
@@ -43,6 +44,11 @@ class KosFinderApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
             repository: authRepository ?? SupabaseAuthRepository(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => OwnerKosProvider(
+            repository: kosRepository ?? KosRepository(),
           ),
         ),
       ],
