@@ -65,6 +65,48 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
     }
   }
 
+  Future<void> _confirmDelete(Kos kos) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Kos'),
+        content: const Text(
+          'Apakah Anda yakin ingin menghapus kos ini secara permanen?',
+        ),
+        actions: [
+          TextButton(
+            key: const Key('cancel_delete_button'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            key: const Key('confirm_delete_button'),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final ownerProvider =
+          Provider.of<OwnerKosProvider?>(context, listen: false);
+      final ok = await ownerProvider?.deleteKos(kos.id) ?? false;
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              ownerProvider?.errorMessage ?? 'Gagal menghapus kos.',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider?>(context);
@@ -176,11 +218,25 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text('${kos.area} · ${kos.formattedPricePerMonth}'),
-            trailing: IconButton(
-              key: Key('edit_kos_${kos.id}'),
-              tooltip: 'Ubah Kos',
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () => _openEditKos(userId, kos),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  key: Key('edit_kos_${kos.id}'),
+                  tooltip: 'Ubah Kos',
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => _openEditKos(userId, kos),
+                ),
+                IconButton(
+                  key: Key('delete_kos_${kos.id}'),
+                  tooltip: 'Hapus Kos',
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  onPressed: () => _confirmDelete(kos),
+                ),
+              ],
             ),
           ),
         );
