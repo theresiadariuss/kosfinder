@@ -33,7 +33,7 @@ Dokumen ini memuat daftar tugas implementasi bertahap menggunakan pendekatan **V
 | ID | Tujuan | Story & AC Terkait | File yang Boleh Diubah | Cara Menguji | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **T07** | Implementasikan fungsi pencarian kata kunci case-insensitive (nama & area) dan filter (harga sewa maks & checklist fasilitas) di provider | US03-AC1, US03-AC2, US03-AC3, US03-AC4 | `lib/providers/kos_list_provider.dart`, `test/providers/kos_list_provider_test.dart` | `flutter test test/providers/kos_list_provider_test.dart` lulus untuk skenario filter & search | Done |
-| **T08** | Integrasikan kolom Search Bar dan BottomSheet filter interaktif di `KosListScreen` serta pesan saat hasil kosong | US03-AC1, US03-AC2, US03-AC3, US03-AC4 | `lib/screens/kos_list_screen.dart`, `lib/widgets/filter_bottom_sheet.dart`, `test/screens/kos_list_screen_test.dart` | Ketik kata kunci "singaraja", terapkan filter harga & fasilitas di UI, pastikan list terfilter akurat atau pesan kosong tampil | Pending |
+| **T08** | Integrasikan kolom Search Bar dan BottomSheet filter interaktif di `KosListScreen` serta pesan saat hasil kosong | US03-AC1, US03-AC2, US03-AC3, US03-AC4 | `lib/screens/kos_list_screen.dart`, `lib/widgets/filter_bottom_sheet.dart`, `test/screens/kos_list_screen_test.dart` | Ketik kata kunci "singaraja", terapkan filter harga & fasilitas di UI, pastikan list terfilter akurat atau pesan kosong tampil | Done |
 
 ---
 
