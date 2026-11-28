@@ -1,17 +1,29 @@
-# kosfinder
+# KosFinder
 
-A new Flutter project.
+Aplikasi Flutter pencari kos untuk memudahkan calon penghuni menemukan informasi kos secara cepat dan terstruktur tanpa perlu login.
 
-## Getting Started
+## Fitur Tersedia
+- **Daftar Kos Publik**: Menampilkan daftar kos beserta nama, area, harga sewa per bulan, tipe penghuni, dan ikon fasilitas.
+- **Detail Kos**: Menampilkan informasi lengkap kos (alamat, deskripsi, fasilitas) serta tombol salin nomor WhatsApp pemilik ke clipboard.
+- **Pencarian**: Pencarian kata kunci *case-insensitive* berdasarkan nama kos atau area.
+- **Filter**: Penyaringan kos berdasarkan harga sewa maksimal per bulan dan checklist fasilitas (WiFi, AC, Kamar Mandi Dalam, Listrik Termasuk).
+- **Halaman About**: Menampilkan informasi aplikasi dan identitas pengembang.
 
-This project is a starting point for a Flutter application.
+## Cara Menjalankan
+Aplikasi memerlukan konfigurasi backend Supabase melalui `--dart-define` saat menjalankan build (ganti nilai contoh di bawah dengan URL dan Anon Key proyek Supabase Anda):
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter pub get
+flutter run --dart-define=SUPABASE_URL=https://contoh-project.supabase.co --dart-define=SUPABASE_ANON_KEY=contoh_anon_key_palsu
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Untuk menjalankan pengujian unit dan widget test (tanpa koneksi Supabase):
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter analyze
+flutter test
+```
+
+## Batasan Versi Saat Ini
+- Autentikasi pemilik kos (Registrasi & Login) belum diimplementasikan.
+- Manajemen CRUD data kos oleh pemilik (Tambah, Ubah, Hapus) belum diimplementasikan.
