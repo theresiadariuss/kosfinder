@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/kos_list_provider.dart';
 import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/kos_card.dart';
+import 'about_screen.dart';
 
 /// Public catalog screen displaying all available boarding houses (`US01`, `US03`).
 class KosListScreen extends StatefulWidget {
@@ -46,6 +47,19 @@ class _KosListScreenState extends State<KosListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('KosFinder'),
+        actions: [
+          IconButton(
+            tooltip: 'Tentang Aplikasi',
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AboutScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
