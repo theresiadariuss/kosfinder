@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:kosfinder/models/kos.dart';
 import 'package:kosfinder/providers/owner_kos_provider.dart';
 import 'package:kosfinder/repositories/kos_repository.dart';
 import 'package:kosfinder/screens/kos_form_screen.dart';
@@ -109,6 +110,94 @@ void main() {
       expect(savedData!['whatsapp_number'], '081999888777');
       expect(savedData!['has_wifi'], isTrue);
       expect(savedData!['owner_id'], 'uid-1');
+    });
+  });
+
+  group('KosFormScreen Edit Mode Tests (US06)', () {
+    const existingKos = Kos(
+      id: 'kos-edit-1',
+      ownerId: 'uid-1',
+      name: 'Kos Lama',
+      area: 'Singaraja Kota',
+      address: 'Jl. Ngurah Rai No. 5',
+      description: 'Deskripsi lama',
+      pricePerMonth: 800000,
+      genderType: 'putri',
+      hasWifi: true,
+      hasAc: false,
+      hasPrivateBathroom: true,
+      includesElectricity: false,
+      whatsappNumber: '08123456789',
+    );
+
+    testWidgets('US06-AC1: Preload data kos yang ada pada form mode edit', (tester) async {
+      final repo = KosRepository();
+      await tester.pumpWidget(
+        _wrap(const KosFormScreen(ownerId: 'uid-1', initialKos: existingKos), repo),
+      );
+
+      expect(find.text('Edit Kos'), findsOneWidget);
+      expect(find.text('Simpan Perubahan'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, 'Kos Lama'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, 'Singaraja Kota'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, '800000'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, '08123456789'), findsOneWidget);
+    });
+
+    testWidgets('US06-AC1: Simpan perubahan berhasil memperbarui data di repository', (tester) async {
+      final repo = KosRepository();
+      String? updatedId;
+      Map<String, dynamic>? updatedData;
+      repo.setCrudHandlers(
+        update: (id, data) async {
+          updatedId = id;
+          updatedData = data;
+        },
+      );
+
+      await tester.pumpWidget(
+        _wrap(const KosFormScreen(ownerId: 'uid-1', initialKos: existingKos), repo),
+      );
+
+      // Ubah harga dan toggle AC
+      final priceField = find.byKey(const Key('kos_price_field'));
+      await tester.ensureVisible(priceField);
+      await tester.enterText(priceField, '1200000');
+
+      final acCheckbox = find.byKey(const Key('kos_ac_checkbox'));
+      await tester.ensureVisible(acCheckbox);
+      await tester.tap(acCheckbox);
+      await tester.pump();
+
+      // Submit
+      final button = find.byKey(const Key('kos_form_submit_button'));
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+
+      expect(updatedId, 'kos-edit-1');
+      expect(updatedData, isNotNull);
+      expect(updatedData!['price_per_month'], 1200000);
+      expect(updatedData!['has_ac'], isTrue);
+    });
+
+    testWidgets('US06-AC2: Penolakan atau kegagalan update menampilkan pesan error di SnackBar', (tester) async {
+      final repo = KosRepository();
+      repo.setCrudHandlers(
+        update: (id, data) async => throw Exception('RLS denied: not owner'),
+      );
+
+      await tester.pumpWidget(
+        _wrap(const KosFormScreen(ownerId: 'uid-2', initialKos: existingKos), repo),
+      );
+
+      final button = find.byKey(const Key('kos_form_submit_button'));
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Gagal memperbarui kos. Silakan coba lagi.'), findsOneWidget);
     });
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/kos.dart';
 import '../providers/auth_provider.dart';
 import '../providers/owner_kos_provider.dart';
 import 'kos_form_screen.dart';
@@ -50,6 +51,20 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
     }
   }
 
+  Future<void> _openEditKos(String? userId, Kos kos) async {
+    if (userId == null) return;
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => KosFormScreen(ownerId: userId, initialKos: kos),
+      ),
+    );
+    if (!mounted) return;
+    if (result == true) {
+      final ownerProvider = Provider.of<OwnerKosProvider?>(context, listen: false);
+      ownerProvider?.loadOwnerKos(userId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider?>(context);
@@ -68,7 +83,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
           ),
         ],
       ),
-      body: _buildBody(context, ownerProvider, user?.email),
+      body: _buildBody(context, ownerProvider, user?.id, user?.email),
       floatingActionButton: FloatingActionButton(
         key: const Key('add_kos_fab'),
         tooltip: 'Tambah Kos',
@@ -81,6 +96,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
   Widget _buildBody(
     BuildContext context,
     OwnerKosProvider? provider,
+    String? userId,
     String? email,
   ) {
     if (provider != null && provider.isLoading) {
@@ -160,6 +176,12 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text('${kos.area} · ${kos.formattedPricePerMonth}'),
+            trailing: IconButton(
+              key: Key('edit_kos_${kos.id}'),
+              tooltip: 'Ubah Kos',
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => _openEditKos(userId, kos),
+            ),
           ),
         );
       },
